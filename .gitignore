@@ -27,3 +27,7 @@ Thumbs.db
 
 # vercel
 .vercel/
+
+# mockup source (referencyjny — niech zostanie lokalnie, nie idzie do gita)
+_mockup_source/
+mockup_extract/

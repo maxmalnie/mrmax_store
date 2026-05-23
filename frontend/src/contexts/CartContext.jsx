@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 
 const CartContext = createContext(null);
-const STORAGE_KEY = 'mrmax_cart_v1';
+const STORAGE_KEY = 'mrmax_cart_v2';
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
@@ -13,15 +13,20 @@ export function CartProvider({ children }) {
     }
   });
 
+  const [ship, setShip] = useState('standard'); // standard | express | pickup
+  const [promo, setPromo] = useState(null);     // { code, discount }
+
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch {}
   }, [items]);
 
-  const add = useCallback((product, variantId, quantity = 1) => {
+  /**
+   * @param product { id, title, image, price, currency }
+   * @param variant { id, syncVariantId, size, color, colorHex, fit }
+   */
+  const add = useCallback((product, variant, quantity = 1) => {
     setItems((prev) => {
-      const key = `${product.id}_${variantId}`;
+      const key = `${product.id}_${variant.id}`;
       const existing = prev.find((it) => it.key === key);
       if (existing) {
         return prev.map((it) =>
@@ -33,11 +38,17 @@ export function CartProvider({ children }) {
         {
           key,
           productId: product.id,
-          variantId,
+          variantId: variant.id,
+          syncVariantId: variant.syncVariantId || variant.id,
           title: product.title,
+          code: product.code,
           image: product.image,
-          price: product.price,
-          currency: product.currency || 'PLN',
+          price: variant.price ?? product.price,
+          currency: variant.currency || product.currency || 'PLN',
+          size: variant.size || null,
+          color: variant.color || null,
+          colorHex: variant.colorHex || null,
+          fit: variant.fit || null,
           quantity,
         },
       ];
@@ -50,9 +61,8 @@ export function CartProvider({ children }) {
 
   const updateQty = useCallback((key, quantity) => {
     setItems((prev) =>
-      prev
-        .map((it) => (it.key === key ? { ...it, quantity } : it))
-        .filter((it) => it.quantity > 0)
+      prev.map((it) => (it.key === key ? { ...it, quantity } : it))
+          .filter((it) => it.quantity > 0)
     );
   }, []);
 
@@ -61,11 +71,16 @@ export function CartProvider({ children }) {
   const totals = useMemo(() => {
     const count = items.reduce((s, it) => s + it.quantity, 0);
     const subtotal = items.reduce((s, it) => s + it.price * it.quantity, 0);
-    return { count, subtotal };
-  }, [items]);
+    const shipPrice = { standard: 0, express: 1900, pickup: 0 }[ship] ?? 0;
+    const discount = promo ? Math.round(subtotal * (promo.discount || 0)) : 0;
+    const total = Math.max(0, subtotal + shipPrice - discount);
+    return { count, subtotal, shipPrice, discount, total };
+  }, [items, ship, promo]);
 
   return (
-    <CartContext.Provider value={{ items, add, remove, updateQty, clear, totals }}>
+    <CartContext.Provider
+      value={{ items, add, remove, updateQty, clear, totals, ship, setShip, promo, setPromo }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -77,11 +92,8 @@ export function useCart() {
   return ctx;
 }
 
-// Helper formatowania ceny (Printify zwraca w centach)
+// formatowanie ceny — Printful zwraca w głównej jednostce (np. "29.50"), my trzymamy w centach/groszach
 export function formatPrice(cents, currency = 'PLN') {
   const value = (cents || 0) / 100;
-  return new Intl.NumberFormat('pl-PL', {
-    style: 'currency',
-    currency,
-  }).format(value);
+  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency }).format(value);
 }

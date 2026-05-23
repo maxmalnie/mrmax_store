@@ -12,21 +12,19 @@ export function ShopProvider({ children }) {
     try {
       setLoading(true);
       const data = await api.listProducts({ limit: 50 });
-      setProducts(data.products || []);
+      const list = (data.products || []).map(decorate);
+      setProducts(list);
       setError(null);
     } catch (e) {
       console.warn('[ShopContext] failed to load products', e);
       setError(e.message);
-      // Mock fallback gdy backend / Printify nie odpowiadają — żeby UI dało się testować
       setProducts(MOCK_PRODUCTS);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
 
   return (
     <ShopContext.Provider value={{ products, loading, error, reload: load }}>
@@ -41,39 +39,85 @@ export function useShop() {
   return ctx;
 }
 
-// --- mock do offline / dev ---
+// Dekoracja: dodaje pola wymagane przez UI (code, edition info, city, year)
+// W docelowym setupie te dane przychodzą z tagów Printful albo z osobnego CMS-a.
+// Tu wstawiamy sensowne defaulty na podstawie indeksu.
+function decorate(p, i) {
+  return {
+    ...p,
+    code: p.code || `MM-${String(i + 1).padStart(3, '0')} / ${new Date().getFullYear()}`,
+    city: p.city || 'Costa da Caparica, PL',
+    year: p.year || new Date().getFullYear(),
+    edition: p.edition ?? 50,
+    editionTotal: p.editionTotal ?? 50,
+    editionRemaining: p.editionRemaining ?? Math.floor(Math.random() * 30) + 10,
+    muralImg: p.muralImg || '/assets/murals/bubbles.jpg',
+    palette: p.palette || ['#93a7c8', '#c5443a', '#d4a82c', '#2f7264'],
+    stock: p.stock || (p.visible ? 'live' : 'soon'),
+    story: p.story || p.description || 'Drop story TBA.',
+  };
+}
+
+// fallback gdy backend / Printful nie odpowiadają (sklep dopiero się napełnia)
 const MOCK_PRODUCTS = [
   {
     id: 'demo-1',
-    title: 'Koszulka „Pomarańczowy gigant"',
-    description: 'Demo produkt — wymień po podpięciu Printify.',
-    price: 8900,
+    title: 'Bubble Boss',
+    code: 'MM-001 / 2024',
+    description: 'The first wall of the «Heavy Sundays» series. A round man in a bowler hat, blowing soap bubbles toward a punctured post-Soviet concrete fence.',
+    story: 'The first wall of the «Heavy Sundays» series. A round man in a bowler hat, blowing soap bubbles toward a punctured post-Soviet concrete fence — the bubbles fall straight into the holes in the wall, and nobody can tell anymore which ones are painted.',
+    city: 'Costa da Caparica, PL',
+    year: 2024,
+    price: 18900,
     currency: 'PLN',
-    image: 'https://placehold.co/600x600/ff8a5c/fff?text=mrmax',
-    images: ['https://placehold.co/600x600/ff8a5c/fff?text=mrmax'],
-    variantsCount: 4,
+    image: '/assets/uploads/Fat1.jpg',
+    images: ['/assets/uploads/Fat1.jpg'],
+    edition: 50,
+    editionTotal: 50,
+    editionRemaining: 17,
+    stock: 'live',
+    muralImg: '/assets/murals/bubbles.jpg',
+    palette: ['#93a7c8', '#c5443a', '#d4a82c', '#2f7264', '#3a2a1c'],
     visible: true,
   },
   {
     id: 'demo-2',
-    title: 'Koszulka „Miętowy chmurek"',
-    description: 'Demo produkt.',
-    price: 7900,
+    title: 'Wall #02',
+    code: 'MM-002 / 2025',
+    description: 'Drop 02 · Spring 2026.',
+    story: 'Drop 02 · Spring 2026 — coming soon.',
+    city: 'Lisbon, PT',
+    year: 2025,
+    price: null,
     currency: 'PLN',
-    image: 'https://placehold.co/600x600/8fd9a8/4e4d76?text=mint',
-    images: ['https://placehold.co/600x600/8fd9a8/4e4d76?text=mint'],
-    variantsCount: 4,
-    visible: true,
+    image: null,
+    images: [],
+    edition: null,
+    editionTotal: 50,
+    editionRemaining: null,
+    stock: 'soon',
+    muralImg: null,
+    palette: ['#caa472', '#3d2c1f', '#8a7355', '#d8b692'],
+    visible: false,
   },
   {
     id: 'demo-3',
-    title: 'Koszulka „Różowy obłok"',
-    description: 'Demo produkt.',
-    price: 8500,
+    title: 'Wall #03',
+    code: 'MM-003 / 2026',
+    description: 'Drop 03 · TBA.',
+    story: 'Drop 03 · location and date TBA.',
+    city: '???',
+    year: 2026,
+    price: null,
     currency: 'PLN',
-    image: 'https://placehold.co/600x600/ffb1c1/4e4d76?text=rose',
-    images: ['https://placehold.co/600x600/ffb1c1/4e4d76?text=rose'],
-    variantsCount: 4,
-    visible: true,
+    image: null,
+    images: [],
+    edition: null,
+    editionTotal: 50,
+    editionRemaining: null,
+    stock: 'soon',
+    muralImg: null,
+    palette: ['#e1d6a8', '#234c70', '#b54a2d', '#f6efd6'],
+    visible: false,
   },
 ];
