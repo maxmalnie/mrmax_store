@@ -1,0 +1,308 @@
+/* ============================================================
+   mrmax store — design tokens (Stylized Claymorphism / Pixar)
+   ============================================================ */
+
+:root {
+  /* Kolory bazowe */
+  --c-bg: #fbe7d2;            /* warm cream */
+  --c-bg-soft: #fff3e0;
+  --c-ink: #4e4d76;            /* zamiast czarnego */
+  --c-ink-soft: #7c7ba1;
+  --c-line: #efd8b8;
+
+  /* Akcent */
+  --c-accent: #ff8a5c;         /* clay orange */
+  --c-accent-hot: #ff6b3d;
+  --c-mint: #8fd9a8;
+  --c-sky: #9cc7ff;
+  --c-rose: #ffb1c1;
+  --c-yellow: #ffd66b;
+
+  /* Glass / surface */
+  --surface: #ffffff;
+  --surface-soft: #fff9f1;
+  --shadow-soft: 0 6px 18px rgba(78, 77, 118, 0.10);
+  --shadow-clay: 0 10px 24px rgba(78, 77, 118, 0.16),
+                 inset 0 -3px 0 rgba(78, 77, 118, 0.06);
+
+  /* Radii — clay = obłe */
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 28px;
+  --r-pill: 999px;
+
+  /* Type */
+  --font-display: 'Baloo 2', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-hand: 'Caveat', cursive;
+
+  /* Layout */
+  --topbar-h: 64px;
+  --max-w: 1180px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--c-ink);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
+}
+
+h1 { font-size: 2.4rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.3rem; }
+
+a {
+  color: var(--c-ink);
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-display);
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ----- App shell ----- */
+
+.app-shell {
+  min-height: 100vh;
+  padding-top: var(--topbar-h);
+}
+
+.screen-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 18px 52px;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+
+/* ----- Buttons ----- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: var(--r-pill);
+  background: var(--c-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: var(--shadow-clay);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s;
+}
+.btn:hover {
+  background: var(--c-accent-hot);
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(78, 77, 118, 0.16);
+}
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--c-ink);
+  box-shadow: var(--shadow-soft);
+}
+.btn-ghost:hover {
+  background: var(--surface-soft);
+}
+
+/* ----- Cards (clay) ----- */
+
+.card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-clay);
+  padding: 18px;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-clay);
+  overflow: hidden;
+  transition: transform 0.18s ease;
+}
+.product-card:hover {
+  transform: translateY(-3px);
+}
+.product-card__img {
+  aspect-ratio: 1 / 1;
+  background: var(--c-bg-soft);
+  width: 100%;
+  object-fit: cover;
+}
+.product-card__body {
+  padding: 14px 16px 18px;
+}
+.product-card__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 6px;
+}
+.product-card__price {
+  color: var(--c-accent-hot);
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+/* ----- Grid ----- */
+
+.grid {
+  display: grid;
+  gap: 22px;
+}
+.grid--products {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+/* ----- TopBar ----- */
+
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--topbar-h);
+  background: rgba(255, 243, 224, 0.85);
+  backdrop-filter: saturate(140%) blur(12px);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  border-bottom: 1px solid var(--c-line);
+  display: flex;
+  align-items: center;
+  z-index: 50;
+}
+.topbar__inner {
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.topbar__brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+.topbar__brand span {
+  color: var(--c-accent-hot);
+}
+.topbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-weight: 600;
+}
+.topbar__nav a {
+  color: var(--c-ink-soft);
+  transition: color 0.12s;
+}
+.topbar__nav a:hover,
+.topbar__nav a.active {
+  color: var(--c-ink);
+}
+.topbar__cart {
+  position: relative;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-soft);
+  font-weight: 700;
+}
+.topbar__cart-badge {
+  display: inline-block;
+  margin-left: 6px;
+  background: var(--c-accent);
+  color: #fff;
+  border-radius: var(--r-pill);
+  padding: 1px 8px;
+  font-size: 0.85rem;
+}
+
+/* ----- Hero ----- */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  padding: 40px 0 24px;
+}
+.hero__title {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.05;
+}
+.hero__title em {
+  font-family: var(--font-hand);
+  font-style: normal;
+  color: var(--c-accent-hot);
+  font-size: 1.1em;
+}
+.hero__sub {
+  font-size: 1.15rem;
+  color: var(--c-ink-soft);
+  margin: 14px 0 24px;
+  max-width: 460px;
+}
+.hero__blob {
+  aspect-ratio: 1 / 1;
+  background:
+    radial-gradient(circle at 30% 30%, var(--c-yellow), transparent 60%),
+    radial-gradient(circle at 70% 70%, var(--c-rose), transparent 55%),
+    var(--c-mint);
+  border-radius: 48% 52% 60% 40% / 55% 45% 55% 45%;
+  box-shadow: var(--shadow-clay);
+  animation: blob 14s ease-in-out infinite;
+}
+@keyframes blob {
+  0%, 100% { border-radius: 48% 52% 60% 40% / 55% 45% 55% 45%; }
+  50%      { border-radius: 60% 40% 45% 55% / 40% 60% 50% 50%; }
+}
+
+@media (max-width: 720px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero__sub { margin-inline: auto; }
+}
+
+/* ----- Utilities ----- */
+
+.muted { color: var(--c-ink-soft); }
+.center { text-align: center; }
+.stack-12 > * + * { margin-top: 12px; }
+.stack-20 > * + * { margin-top: 20px; }
